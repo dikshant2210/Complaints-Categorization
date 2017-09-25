@@ -1,4 +1,5 @@
 from utils import complaint_to_words
+from nltk.probability import FreqDist
 
 
 class Lang:
@@ -9,14 +10,16 @@ class Lang:
         self.index2word = dict()
         self.label2index = dict()
         self.index2label = dict()
-        self.vocabulary = 0
+        self.vocabulary = 60000
 
     def create_index(self):
         words = list()
         for comp in self.complaints:
             words += complaint_to_words(comp)
-        words = set(words)
-        self.vocabulary = len(words)
+        words = FreqDist(words)
+        words = words.most_common(self.vocabulary)
+        words = [word[0] for word in words]
+        words.insert(0, 'UNK')
         for index, word in enumerate(words):
             self.index2word[index] = word
             self.word2index[word] = index
